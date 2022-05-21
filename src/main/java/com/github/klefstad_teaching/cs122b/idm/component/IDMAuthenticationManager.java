@@ -63,15 +63,20 @@ public class IDMAuthenticationManager
 
     public User selectAndAuthenticateUser(String email, char[] password)
     {
+
         return null;
     }
 
     public void createAndInsertUser(String email, char[] password)
     {
+        // salt and has the password, then pass
+        byte[] salt = genSalt();
+        repo.insertUserIntoRepo(email, salt, password);
     }
 
     public void insertRefreshToken(RefreshToken refreshToken)
     {
+
     }
 
     public RefreshToken verifyRefreshToken(String token)

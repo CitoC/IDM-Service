@@ -49,28 +49,28 @@ public class IDMServiceTest
     private static final String AUTHENTICATE_PATH = "/authenticate";
 
     private static final JSONObject ADMIN    = makeUser("Admin@example.com",
-                                                        "AdminPassWord0");
+            "AdminPassWord0");
     private static final JSONObject EMPLOYEE = makeUser("Employee@example.com",
-                                                        "EmployeePassWord0");
+            "EmployeePassWord0");
     private static final JSONObject PREMIUM  = makeUser("Premium@example.com",
-                                                        "PremiumPassWord0");
+            "PremiumPassWord0");
 
     private static final JSONObject ACTIVE = makeUser("Active@example.com",
-                                                      "ActivePassWord0");
+            "ActivePassWord0");
     private static final JSONObject LOCKED = makeUser("Locked@example.com",
-                                                      "LockedPassWord0");
+            "LockedPassWord0");
     private static final JSONObject BANNED = makeUser("Banned@example.com",
-                                                      "BannedPassWord0");
+            "BannedPassWord0");
 
     private static final JSONObject LOGIN_MIN_PASS = makeUser("LoginMinPass@example.com",
-                                                              "ValidPass0");
+            "ValidPass0");
     private static final JSONObject LOGIN_MAX_PASS = makeUser("LoginMaxPass@example.com",
-                                                              "ValidPass01234567890");
+            "ValidPass01234567890");
 
     private static final JSONObject LOGIN_MIN_EMAIL = makeUser("a@a.io",
-                                                               "MinEmailPassWord0");
+            "MinEmailPassWord0");
     private static final JSONObject LOGIN_MAX_EMAIL = makeUser("LoginIsRightAtMaxLen@example.com",
-                                                               "MaxEmailPassWord0");
+            "MaxEmailPassWord0");
 
     private static final String EXPIRED_TOKEN = "c46fc3c2-9791-44d6-a86e-2922ad655284";
     private static final String REVOKED_TOKEN = "399cd90d-e715-484a-bb4d-a8ff35506ef9";
@@ -87,12 +87,12 @@ public class IDMServiceTest
     {
         this.mockMvc = mockMvc;
         this.jwtManager =
-            new JWTManager.Builder()
-                .keyFileName(keyFileName)
-                .accessTokenExpire(accessTokenExpire)
-                .maxRefreshTokenLifeTime(maxRefreshTokenLifeTime)
-                .refreshTokenExpire(refreshTokenExpire)
-                .build();
+                new JWTManager.Builder()
+                        .keyFileName(keyFileName)
+                        .accessTokenExpire(accessTokenExpire)
+                        .maxRefreshTokenLifeTime(maxRefreshTokenLifeTime)
+                        .refreshTokenExpire(refreshTokenExpire)
+                        .build();
 
     }
 
@@ -111,9 +111,9 @@ public class IDMServiceTest
     private ResultMatcher[] isResult(Result result)
     {
         return new ResultMatcher[]{
-            status().is(result.status().value()),
-            jsonPath("result.code").value(result.code()),
-            jsonPath("result.message").value(result.message())
+                status().is(result.status().value()),
+                jsonPath("result.code").value(result.code()),
+                jsonPath("result.message").value(result.message())
         };
     }
 
@@ -126,383 +126,383 @@ public class IDMServiceTest
 
     @Test
     public void registerSuccessMinPassword()
-        throws Exception
+            throws Exception
     {
         JSONObject request = makeUser("RegisterMin@example.com", "ValidPass0");
 
         this.mockMvc.perform(post(REGISTER_PATH).contentType(MediaType.APPLICATION_JSON)
-                                                .content(request.toJSONString()))
-                    .andDo(print())
-                    .andExpectAll(isResult(IDMResults.USER_REGISTERED_SUCCESSFULLY));
+                        .content(request.toJSONString()))
+                .andDo(print())
+                .andExpectAll(isResult(IDMResults.USER_REGISTERED_SUCCESSFULLY));
     }
 
     @Test
     public void registerSuccessMaxPassword()
-        throws Exception
+            throws Exception
     {
         JSONObject request = makeUser("RegisterMax@example.com", "ValidPass01234567890");
 
         this.mockMvc.perform(post(REGISTER_PATH).contentType(MediaType.APPLICATION_JSON)
-                                                .content(request.toJSONString()))
-                    .andDo(print())
-                    .andExpectAll(isResult(IDMResults.USER_REGISTERED_SUCCESSFULLY));
+                        .content(request.toJSONString()))
+                .andDo(print())
+                .andExpectAll(isResult(IDMResults.USER_REGISTERED_SUCCESSFULLY));
     }
 
     @Test
     public void registerSuccessMinEmail()
-        throws Exception
+            throws Exception
     {
         JSONObject request = makeUser("b@b.io", "ValidPassWord0");
 
         this.mockMvc.perform(post(REGISTER_PATH).contentType(MediaType.APPLICATION_JSON)
-                                                .content(request.toJSONString()))
-                    .andDo(print())
-                    .andExpectAll(isResult(IDMResults.USER_REGISTERED_SUCCESSFULLY));
+                        .content(request.toJSONString()))
+                .andDo(print())
+                .andExpectAll(isResult(IDMResults.USER_REGISTERED_SUCCESSFULLY));
     }
 
     @Test
     public void registerSuccessMaxEmail()
-        throws Exception
+            throws Exception
     {
         JSONObject request = makeUser("EmailIsRightAtMaxLen@example.com", "ValidPassWord0");
 
         this.mockMvc.perform(post(REGISTER_PATH).contentType(MediaType.APPLICATION_JSON)
-                                                .content(request.toJSONString()))
-                    .andDo(print())
-                    .andExpectAll(isResult(IDMResults.USER_REGISTERED_SUCCESSFULLY));
+                        .content(request.toJSONString()))
+                .andDo(print())
+                .andExpectAll(isResult(IDMResults.USER_REGISTERED_SUCCESSFULLY));
     }
 
     @Test
     public void registerPasswordTooShort()
-        throws Exception
+            throws Exception
     {
         JSONObject request = makeUser("RegisterFail1@example.com", "TooShort0");
 
         this.mockMvc.perform(post(REGISTER_PATH).contentType(MediaType.APPLICATION_JSON)
-                                                .content(request.toJSONString()))
-                    .andDo(print())
-                    .andExpectAll(isResult(IDMResults.PASSWORD_DOES_NOT_MEET_LENGTH_REQUIREMENTS));
+                        .content(request.toJSONString()))
+                .andDo(print())
+                .andExpectAll(isResult(IDMResults.PASSWORD_DOES_NOT_MEET_LENGTH_REQUIREMENTS));
     }
 
     @Test
     public void registerPasswordTooLong()
-        throws Exception
+            throws Exception
     {
         JSONObject request = makeUser("RegisterFail2@example.com", "WayTooLongPassword012");
 
         this.mockMvc.perform(post(REGISTER_PATH).contentType(MediaType.APPLICATION_JSON)
-                                                .content(request.toJSONString()))
-                    .andDo(print())
-                    .andExpectAll(isResult(IDMResults.PASSWORD_DOES_NOT_MEET_LENGTH_REQUIREMENTS));
+                        .content(request.toJSONString()))
+                .andDo(print())
+                .andExpectAll(isResult(IDMResults.PASSWORD_DOES_NOT_MEET_LENGTH_REQUIREMENTS));
     }
 
     @Test
     public void registerPasswordMissingNumber()
-        throws Exception
+            throws Exception
     {
         JSONObject request = makeUser("RegisterFail3@example.com", "NoNumberPassword");
 
         this.mockMvc.perform(post(REGISTER_PATH).contentType(MediaType.APPLICATION_JSON)
-                                                .content(request.toJSONString()))
-                    .andDo(print())
-                    .andExpectAll(isResult(IDMResults.PASSWORD_DOES_NOT_MEET_CHARACTER_REQUIREMENT));
+                        .content(request.toJSONString()))
+                .andDo(print())
+                .andExpectAll(isResult(IDMResults.PASSWORD_DOES_NOT_MEET_CHARACTER_REQUIREMENT));
     }
 
     @Test
     public void registerPasswordMissingUpperCase()
-        throws Exception
+            throws Exception
     {
         JSONObject request = makeUser("RegisterFail4@example.com", "nouppercase0");
 
         this.mockMvc.perform(post(REGISTER_PATH).contentType(MediaType.APPLICATION_JSON)
-                                                .content(request.toJSONString()))
-                    .andDo(print())
-                    .andExpectAll(isResult(IDMResults.PASSWORD_DOES_NOT_MEET_CHARACTER_REQUIREMENT));
+                        .content(request.toJSONString()))
+                .andDo(print())
+                .andExpectAll(isResult(IDMResults.PASSWORD_DOES_NOT_MEET_CHARACTER_REQUIREMENT));
     }
 
     @Test
     public void registerPasswordMissingLowerCase()
-        throws Exception
+            throws Exception
     {
         JSONObject request = makeUser("RegisterFail5@example.com", "NOLOWERCASE0");
 
         this.mockMvc.perform(post(REGISTER_PATH).contentType(MediaType.APPLICATION_JSON)
-                                                .content(request.toJSONString()))
-                    .andDo(print())
-                    .andExpectAll(isResult(IDMResults.PASSWORD_DOES_NOT_MEET_CHARACTER_REQUIREMENT));
+                        .content(request.toJSONString()))
+                .andDo(print())
+                .andExpectAll(isResult(IDMResults.PASSWORD_DOES_NOT_MEET_CHARACTER_REQUIREMENT));
     }
 
     @Test
     public void registerEmailTooShort()
-        throws Exception
+            throws Exception
     {
         JSONObject request = makeUser("a@a.a", "ValidPassWord0");
 
         this.mockMvc.perform(post(REGISTER_PATH).contentType(MediaType.APPLICATION_JSON)
-                                                .content(request.toJSONString()))
-                    .andDo(print())
-                    .andExpectAll(isResult(IDMResults.EMAIL_ADDRESS_HAS_INVALID_LENGTH));
+                        .content(request.toJSONString()))
+                .andDo(print())
+                .andExpectAll(isResult(IDMResults.EMAIL_ADDRESS_HAS_INVALID_LENGTH));
     }
 
     @Test
     public void registerEmailTooLong()
-        throws Exception
+            throws Exception
     {
         JSONObject request = makeUser("EmailTooLongToSucceed@example.com", "ValidPassWord0");
 
         this.mockMvc.perform(post(REGISTER_PATH).contentType(MediaType.APPLICATION_JSON)
-                                                .content(request.toJSONString()))
-                    .andDo(print())
-                    .andExpectAll(isResult(IDMResults.EMAIL_ADDRESS_HAS_INVALID_LENGTH));
+                        .content(request.toJSONString()))
+                .andDo(print())
+                .andExpectAll(isResult(IDMResults.EMAIL_ADDRESS_HAS_INVALID_LENGTH));
     }
 
     @Test
     public void registerEmailNotValid()
-        throws Exception
+            throws Exception
     {
         JSONObject request = makeUser("NotValidEmail", "ValidPassWord0");
 
         this.mockMvc.perform(post(REGISTER_PATH).contentType(MediaType.APPLICATION_JSON)
-                                                .content(request.toJSONString()))
-                    .andDo(print())
-                    .andExpectAll(isResult(IDMResults.EMAIL_ADDRESS_HAS_INVALID_FORMAT));
+                        .content(request.toJSONString()))
+                .andDo(print())
+                .andExpectAll(isResult(IDMResults.EMAIL_ADDRESS_HAS_INVALID_FORMAT));
     }
 
     @Test
     public void registerAlreadyExists()
-        throws Exception
+            throws Exception
     {
         this.mockMvc.perform(post(REGISTER_PATH).contentType(MediaType.APPLICATION_JSON)
-                                                .content(ACTIVE.toString()))
-                    .andDo(print())
-                    .andExpectAll(isResult(IDMResults.USER_ALREADY_EXISTS));
+                        .content(ACTIVE.toString()))
+                .andDo(print())
+                .andExpectAll(isResult(IDMResults.USER_ALREADY_EXISTS));
     }
 
     @Test
     public void loginSuccessMinPassword()
-        throws Exception
+            throws Exception
     {
         this.mockMvc.perform(post(LOGIN_PATH).contentType(MediaType.APPLICATION_JSON)
-                                             .content(LOGIN_MIN_PASS.toJSONString()))
-                    .andDo(print())
-                    .andExpectAll(isResult(IDMResults.USER_LOGGED_IN_SUCCESSFULLY))
-                    .andExpect(jsonPath("accessToken").isNotEmpty())
-                    .andExpect(jsonPath("refreshToken").isNotEmpty());
+                        .content(LOGIN_MIN_PASS.toJSONString()))
+                .andDo(print())
+                .andExpectAll(isResult(IDMResults.USER_LOGGED_IN_SUCCESSFULLY))
+                .andExpect(jsonPath("accessToken").isNotEmpty())
+                .andExpect(jsonPath("refreshToken").isNotEmpty());
     }
 
     @Test
     public void loginSuccessMaxPassword()
-        throws Exception
+            throws Exception
     {
         this.mockMvc.perform(post(LOGIN_PATH).contentType(MediaType.APPLICATION_JSON)
-                                             .content(LOGIN_MAX_PASS.toJSONString()))
-                    .andDo(print())
-                    .andExpectAll(isResult(IDMResults.USER_LOGGED_IN_SUCCESSFULLY))
-                    .andExpect(jsonPath("accessToken").isNotEmpty())
-                    .andExpect(jsonPath("refreshToken").isNotEmpty());
+                        .content(LOGIN_MAX_PASS.toJSONString()))
+                .andDo(print())
+                .andExpectAll(isResult(IDMResults.USER_LOGGED_IN_SUCCESSFULLY))
+                .andExpect(jsonPath("accessToken").isNotEmpty())
+                .andExpect(jsonPath("refreshToken").isNotEmpty());
     }
 
     @Test
     public void loginSuccessMinEmail()
-        throws Exception
+            throws Exception
     {
         this.mockMvc.perform(post(LOGIN_PATH).contentType(MediaType.APPLICATION_JSON)
-                                             .content(LOGIN_MIN_EMAIL.toJSONString()))
-                    .andDo(print())
-                    .andExpectAll(isResult(IDMResults.USER_LOGGED_IN_SUCCESSFULLY))
-                    .andExpect(jsonPath("accessToken").isNotEmpty())
-                    .andExpect(jsonPath("refreshToken").isNotEmpty());
+                        .content(LOGIN_MIN_EMAIL.toJSONString()))
+                .andDo(print())
+                .andExpectAll(isResult(IDMResults.USER_LOGGED_IN_SUCCESSFULLY))
+                .andExpect(jsonPath("accessToken").isNotEmpty())
+                .andExpect(jsonPath("refreshToken").isNotEmpty());
     }
 
     @Test
     public void loginSuccessMaxEmail()
-        throws Exception
+            throws Exception
     {
         this.mockMvc.perform(post(LOGIN_PATH).contentType(MediaType.APPLICATION_JSON)
-                                             .content(LOGIN_MAX_EMAIL.toJSONString()))
-                    .andDo(print())
-                    .andExpectAll(isResult(IDMResults.USER_LOGGED_IN_SUCCESSFULLY))
-                    .andExpect(jsonPath("accessToken").isNotEmpty())
-                    .andExpect(jsonPath("refreshToken").isNotEmpty());
+                        .content(LOGIN_MAX_EMAIL.toJSONString()))
+                .andDo(print())
+                .andExpectAll(isResult(IDMResults.USER_LOGGED_IN_SUCCESSFULLY))
+                .andExpect(jsonPath("accessToken").isNotEmpty())
+                .andExpect(jsonPath("refreshToken").isNotEmpty());
     }
 
     @Test
     public void loginPasswordTooShort()
-        throws Exception
+            throws Exception
     {
         JSONObject request = makeUser("LoginFail1@example.com", "TooShort0");
 
         this.mockMvc.perform(post(LOGIN_PATH).contentType(MediaType.APPLICATION_JSON)
-                                             .content(request.toJSONString()))
-                    .andDo(print())
-                    .andExpectAll(isResult(IDMResults.PASSWORD_DOES_NOT_MEET_LENGTH_REQUIREMENTS))
-                    .andExpect(jsonPath("accessToken").doesNotHaveJsonPath())
-                    .andExpect(jsonPath("refreshToken").doesNotHaveJsonPath());
+                        .content(request.toJSONString()))
+                .andDo(print())
+                .andExpectAll(isResult(IDMResults.PASSWORD_DOES_NOT_MEET_LENGTH_REQUIREMENTS))
+                .andExpect(jsonPath("accessToken").doesNotHaveJsonPath())
+                .andExpect(jsonPath("refreshToken").doesNotHaveJsonPath());
     }
 
     @Test
     public void loginPasswordTooLong()
-        throws Exception
+            throws Exception
     {
         JSONObject request = makeUser("LoginFail2@example.com", "WayTooLongPassword012");
 
         this.mockMvc.perform(post(LOGIN_PATH).contentType(MediaType.APPLICATION_JSON)
-                                             .content(request.toJSONString()))
-                    .andDo(print())
-                    .andExpectAll(isResult(IDMResults.PASSWORD_DOES_NOT_MEET_LENGTH_REQUIREMENTS))
-                    .andExpect(jsonPath("accessToken").doesNotHaveJsonPath())
-                    .andExpect(jsonPath("refreshToken").doesNotHaveJsonPath());
+                        .content(request.toJSONString()))
+                .andDo(print())
+                .andExpectAll(isResult(IDMResults.PASSWORD_DOES_NOT_MEET_LENGTH_REQUIREMENTS))
+                .andExpect(jsonPath("accessToken").doesNotHaveJsonPath())
+                .andExpect(jsonPath("refreshToken").doesNotHaveJsonPath());
     }
 
     @Test
     public void loginPasswordMissingNumber()
-        throws Exception
+            throws Exception
     {
         JSONObject request = makeUser("LoginFail3@example.com", "NoNumberPassword");
 
         this.mockMvc.perform(post(LOGIN_PATH).contentType(MediaType.APPLICATION_JSON)
-                                             .content(request.toJSONString()))
-                    .andDo(print())
-                    .andExpectAll(isResult(IDMResults.PASSWORD_DOES_NOT_MEET_CHARACTER_REQUIREMENT))
-                    .andExpect(jsonPath("accessToken").doesNotHaveJsonPath())
-                    .andExpect(jsonPath("refreshToken").doesNotHaveJsonPath());
+                        .content(request.toJSONString()))
+                .andDo(print())
+                .andExpectAll(isResult(IDMResults.PASSWORD_DOES_NOT_MEET_CHARACTER_REQUIREMENT))
+                .andExpect(jsonPath("accessToken").doesNotHaveJsonPath())
+                .andExpect(jsonPath("refreshToken").doesNotHaveJsonPath());
     }
 
     @Test
     public void loginPasswordMissingUpperCase()
-        throws Exception
+            throws Exception
     {
         JSONObject request = makeUser("LoginFail4@example.com", "nouppercase0");
 
         this.mockMvc.perform(post(LOGIN_PATH).contentType(MediaType.APPLICATION_JSON)
-                                             .content(request.toJSONString()))
-                    .andDo(print())
-                    .andExpectAll(isResult(IDMResults.PASSWORD_DOES_NOT_MEET_CHARACTER_REQUIREMENT))
-                    .andExpect(jsonPath("accessToken").doesNotHaveJsonPath())
-                    .andExpect(jsonPath("refreshToken").doesNotHaveJsonPath());
+                        .content(request.toJSONString()))
+                .andDo(print())
+                .andExpectAll(isResult(IDMResults.PASSWORD_DOES_NOT_MEET_CHARACTER_REQUIREMENT))
+                .andExpect(jsonPath("accessToken").doesNotHaveJsonPath())
+                .andExpect(jsonPath("refreshToken").doesNotHaveJsonPath());
     }
 
     @Test
     public void loginPasswordMissingLowerCase()
-        throws Exception
+            throws Exception
     {
         JSONObject request = makeUser("LoginFail5@example.com", "NOLOWERCASE0");
 
         this.mockMvc.perform(post(LOGIN_PATH).contentType(MediaType.APPLICATION_JSON)
-                                             .content(request.toJSONString()))
-                    .andDo(print())
-                    .andExpectAll(isResult(IDMResults.PASSWORD_DOES_NOT_MEET_CHARACTER_REQUIREMENT))
-                    .andExpect(jsonPath("accessToken").doesNotHaveJsonPath())
-                    .andExpect(jsonPath("refreshToken").doesNotHaveJsonPath());
+                        .content(request.toJSONString()))
+                .andDo(print())
+                .andExpectAll(isResult(IDMResults.PASSWORD_DOES_NOT_MEET_CHARACTER_REQUIREMENT))
+                .andExpect(jsonPath("accessToken").doesNotHaveJsonPath())
+                .andExpect(jsonPath("refreshToken").doesNotHaveJsonPath());
     }
 
     @Test
     public void loginEmailTooShort()
-        throws Exception
+            throws Exception
     {
         JSONObject request = makeUser("a@a.a", "ValidPass01234567890");
 
         this.mockMvc.perform(post(LOGIN_PATH).contentType(MediaType.APPLICATION_JSON)
-                                             .content(request.toJSONString()))
-                    .andDo(print())
-                    .andExpectAll(isResult(IDMResults.EMAIL_ADDRESS_HAS_INVALID_LENGTH))
-                    .andExpect(jsonPath("accessToken").doesNotHaveJsonPath())
-                    .andExpect(jsonPath("refreshToken").doesNotHaveJsonPath());
+                        .content(request.toJSONString()))
+                .andDo(print())
+                .andExpectAll(isResult(IDMResults.EMAIL_ADDRESS_HAS_INVALID_LENGTH))
+                .andExpect(jsonPath("accessToken").doesNotHaveJsonPath())
+                .andExpect(jsonPath("refreshToken").doesNotHaveJsonPath());
     }
 
     @Test
     public void loginEmailTooLong()
-        throws Exception
+            throws Exception
     {
         JSONObject request = makeUser("EmailTooLongToSucceed@example.com", "ValidPass01234567890");
 
         this.mockMvc.perform(post(LOGIN_PATH).contentType(MediaType.APPLICATION_JSON)
-                                             .content(request.toJSONString()))
-                    .andDo(print())
-                    .andExpectAll(isResult(IDMResults.EMAIL_ADDRESS_HAS_INVALID_LENGTH))
-                    .andExpect(jsonPath("accessToken").doesNotHaveJsonPath())
-                    .andExpect(jsonPath("refreshToken").doesNotHaveJsonPath());
+                        .content(request.toJSONString()))
+                .andDo(print())
+                .andExpectAll(isResult(IDMResults.EMAIL_ADDRESS_HAS_INVALID_LENGTH))
+                .andExpect(jsonPath("accessToken").doesNotHaveJsonPath())
+                .andExpect(jsonPath("refreshToken").doesNotHaveJsonPath());
     }
 
     @Test
     public void loginEmailNotValid()
-        throws Exception
+            throws Exception
     {
         JSONObject request = makeUser("NotValidEmail", "ValidPass01234567890");
 
         this.mockMvc.perform(post(LOGIN_PATH).contentType(MediaType.APPLICATION_JSON)
-                                             .content(request.toJSONString()))
-                    .andDo(print())
-                    .andExpectAll(isResult(IDMResults.EMAIL_ADDRESS_HAS_INVALID_FORMAT))
-                    .andExpect(jsonPath("accessToken").doesNotHaveJsonPath())
-                    .andExpect(jsonPath("refreshToken").doesNotHaveJsonPath());
+                        .content(request.toJSONString()))
+                .andDo(print())
+                .andExpectAll(isResult(IDMResults.EMAIL_ADDRESS_HAS_INVALID_FORMAT))
+                .andExpect(jsonPath("accessToken").doesNotHaveJsonPath())
+                .andExpect(jsonPath("refreshToken").doesNotHaveJsonPath());
     }
 
     @Test
     public void loginDoesntExist()
-        throws Exception
+            throws Exception
     {
         JSONObject request = makeUser("DoesntExist@example.com", "ValidPass0");
 
         this.mockMvc.perform(post(LOGIN_PATH).contentType(MediaType.APPLICATION_JSON)
-                                             .content(request.toJSONString()))
-                    .andDo(print())
-                    .andExpectAll(isResult(IDMResults.USER_NOT_FOUND))
-                    .andExpect(jsonPath("accessToken").doesNotHaveJsonPath())
-                    .andExpect(jsonPath("refreshToken").doesNotHaveJsonPath());
+                        .content(request.toJSONString()))
+                .andDo(print())
+                .andExpectAll(isResult(IDMResults.USER_NOT_FOUND))
+                .andExpect(jsonPath("accessToken").doesNotHaveJsonPath())
+                .andExpect(jsonPath("refreshToken").doesNotHaveJsonPath());
     }
 
     @Test
     public void loginBannedAccount()
-        throws Exception
+            throws Exception
     {
         this.mockMvc.perform(post(LOGIN_PATH).contentType(MediaType.APPLICATION_JSON)
-                                             .content(BANNED.toString()))
-                    .andDo(print())
-                    .andExpectAll(isResult(IDMResults.USER_IS_BANNED))
-                    .andExpect(jsonPath("accessToken").doesNotHaveJsonPath())
-                    .andExpect(jsonPath("refreshToken").doesNotHaveJsonPath());
+                        .content(BANNED.toString()))
+                .andDo(print())
+                .andExpectAll(isResult(IDMResults.USER_IS_BANNED))
+                .andExpect(jsonPath("accessToken").doesNotHaveJsonPath())
+                .andExpect(jsonPath("refreshToken").doesNotHaveJsonPath());
     }
 
     @Test
     public void loginLockedAccount()
-        throws Exception
+            throws Exception
     {
         this.mockMvc.perform(post(LOGIN_PATH).contentType(MediaType.APPLICATION_JSON)
-                                             .content(LOCKED.toString()))
-                    .andDo(print())
-                    .andExpectAll(isResult(IDMResults.USER_IS_LOCKED))
-                    .andExpect(jsonPath("accessToken").doesNotHaveJsonPath())
-                    .andExpect(jsonPath("refreshToken").doesNotHaveJsonPath());
+                        .content(LOCKED.toString()))
+                .andDo(print())
+                .andExpectAll(isResult(IDMResults.USER_IS_LOCKED))
+                .andExpect(jsonPath("accessToken").doesNotHaveJsonPath())
+                .andExpect(jsonPath("refreshToken").doesNotHaveJsonPath());
     }
 
     @Test
     public void loginWrongPassword()
-        throws Exception
+            throws Exception
     {
         JSONObject request = makeUser(ACTIVE.getAsString("email"), "WrongPass0");
 
         this.mockMvc.perform(post(LOGIN_PATH).contentType(MediaType.APPLICATION_JSON)
-                                             .content(request.toJSONString()))
-                    .andDo(print())
-                    .andExpectAll(isResult(IDMResults.INVALID_CREDENTIALS))
-                    .andExpect(jsonPath("accessToken").doesNotHaveJsonPath())
-                    .andExpect(jsonPath("refreshToken").doesNotHaveJsonPath());
+                        .content(request.toJSONString()))
+                .andDo(print())
+                .andExpectAll(isResult(IDMResults.INVALID_CREDENTIALS))
+                .andExpect(jsonPath("accessToken").doesNotHaveJsonPath())
+                .andExpect(jsonPath("refreshToken").doesNotHaveJsonPath());
     }
 
     @Test
     public void refreshActiveToken()
-        throws Exception
+            throws Exception
     {
         JSONObject responseObject =
-            (JSONObject) JSONValue.parse(
-                this.mockMvc.perform(post(LOGIN_PATH).contentType(MediaType.APPLICATION_JSON)
-                                                     .content(ACTIVE.toString()))
-                            .andDo(print())
-                            .andExpectAll(isResult(IDMResults.USER_LOGGED_IN_SUCCESSFULLY))
-                            .andReturn()
-                            .getResponse()
-                            .getContentAsString());
+                (JSONObject) JSONValue.parse(
+                        this.mockMvc.perform(post(LOGIN_PATH).contentType(MediaType.APPLICATION_JSON)
+                                        .content(ACTIVE.toString()))
+                                .andDo(print())
+                                .andExpectAll(isResult(IDMResults.USER_LOGGED_IN_SUCCESSFULLY))
+                                .andReturn()
+                                .getResponse()
+                                .getContentAsString());
 
         String refreshToken = responseObject.getAsString("refreshToken");
 
@@ -510,56 +510,56 @@ public class IDMServiceTest
         request.put("refreshToken", responseObject.getAsString("refreshToken"));
 
         this.mockMvc.perform(post(REFRESH_PATH).contentType(MediaType.APPLICATION_JSON)
-                                               .content(request.toJSONString()))
-                    .andDo(print())
-                    .andExpectAll(isResult(IDMResults.RENEWED_FROM_REFRESH_TOKEN))
-                    .andExpect(jsonPath("accessToken").hasJsonPath())
-                    .andExpect(jsonPath("refreshToken").value(refreshToken));
+                        .content(request.toJSONString()))
+                .andDo(print())
+                .andExpectAll(isResult(IDMResults.RENEWED_FROM_REFRESH_TOKEN))
+                .andExpect(jsonPath("accessToken").hasJsonPath())
+                .andExpect(jsonPath("refreshToken").value(refreshToken));
     }
 
     @Test
     public void refreshExpiredToken()
-        throws Exception
+            throws Exception
     {
         JSONObject request = new JSONObject();
         request.put("refreshToken", EXPIRED_TOKEN);
 
         this.mockMvc.perform(post(REFRESH_PATH).contentType(MediaType.APPLICATION_JSON)
-                                               .content(request.toJSONString()))
-                    .andDo(print())
-                    .andExpectAll(isResult(IDMResults.REFRESH_TOKEN_IS_EXPIRED))
-                    .andExpect(jsonPath("accessToken").doesNotHaveJsonPath())
-                    .andExpect(jsonPath("refreshToken").doesNotHaveJsonPath());
+                        .content(request.toJSONString()))
+                .andDo(print())
+                .andExpectAll(isResult(IDMResults.REFRESH_TOKEN_IS_EXPIRED))
+                .andExpect(jsonPath("accessToken").doesNotHaveJsonPath())
+                .andExpect(jsonPath("refreshToken").doesNotHaveJsonPath());
     }
 
     @Test
     public void refreshRevokedToken()
-        throws Exception
+            throws Exception
     {
         JSONObject request = new JSONObject();
         request.put("refreshToken", REVOKED_TOKEN);
 
         this.mockMvc.perform(post(REFRESH_PATH).contentType(MediaType.APPLICATION_JSON)
-                                               .content(request.toJSONString()))
-                    .andDo(print())
-                    .andExpectAll(isResult(IDMResults.REFRESH_TOKEN_IS_REVOKED))
-                    .andExpect(jsonPath("accessToken").doesNotHaveJsonPath())
-                    .andExpect(jsonPath("refreshToken").doesNotHaveJsonPath());
+                        .content(request.toJSONString()))
+                .andDo(print())
+                .andExpectAll(isResult(IDMResults.REFRESH_TOKEN_IS_REVOKED))
+                .andExpect(jsonPath("accessToken").doesNotHaveJsonPath())
+                .andExpect(jsonPath("refreshToken").doesNotHaveJsonPath());
     }
 
     @Test
     public void refreshBeforeExpire()
-        throws Exception
+            throws Exception
     {
         JSONObject loginResponse =
-            (JSONObject) JSONValue.parse(
-                this.mockMvc.perform(post(LOGIN_PATH).contentType(MediaType.APPLICATION_JSON)
-                                                     .content(ACTIVE.toString()))
-                            .andDo(print())
-                            .andExpectAll(isResult(IDMResults.USER_LOGGED_IN_SUCCESSFULLY))
-                            .andReturn()
-                            .getResponse()
-                            .getContentAsString());
+                (JSONObject) JSONValue.parse(
+                        this.mockMvc.perform(post(LOGIN_PATH).contentType(MediaType.APPLICATION_JSON)
+                                        .content(ACTIVE.toString()))
+                                .andDo(print())
+                                .andExpectAll(isResult(IDMResults.USER_LOGGED_IN_SUCCESSFULLY))
+                                .andReturn()
+                                .getResponse()
+                                .getContentAsString());
 
         Thread.sleep(jwtManager.getRefreshTokenExpire().minus(Duration.ofSeconds(1)).toMillis());
 
@@ -569,26 +569,26 @@ public class IDMServiceTest
         request.put("refreshToken", refreshToken);
 
         this.mockMvc.perform(post(REFRESH_PATH).contentType(MediaType.APPLICATION_JSON)
-                                               .content(request.toJSONString()))
-                    .andDo(print())
-                    .andExpectAll(isResult(IDMResults.RENEWED_FROM_REFRESH_TOKEN))
-                    .andExpect(jsonPath("accessToken").isNotEmpty())
-                    .andExpect(jsonPath("refreshToken").value(refreshToken));
+                        .content(request.toJSONString()))
+                .andDo(print())
+                .andExpectAll(isResult(IDMResults.RENEWED_FROM_REFRESH_TOKEN))
+                .andExpect(jsonPath("accessToken").isNotEmpty())
+                .andExpect(jsonPath("refreshToken").value(refreshToken));
     }
 
     @Test
     public void refreshAfterExpire()
-        throws Exception
+            throws Exception
     {
         JSONObject loginResponse =
-            (JSONObject) JSONValue.parse(
-                this.mockMvc.perform(post(LOGIN_PATH).contentType(MediaType.APPLICATION_JSON)
-                                                     .content(ACTIVE.toString()))
-                            .andDo(print())
-                            .andExpectAll(isResult(IDMResults.USER_LOGGED_IN_SUCCESSFULLY))
-                            .andReturn()
-                            .getResponse()
-                            .getContentAsString());
+                (JSONObject) JSONValue.parse(
+                        this.mockMvc.perform(post(LOGIN_PATH).contentType(MediaType.APPLICATION_JSON)
+                                        .content(ACTIVE.toString()))
+                                .andDo(print())
+                                .andExpectAll(isResult(IDMResults.USER_LOGGED_IN_SUCCESSFULLY))
+                                .andReturn()
+                                .getResponse()
+                                .getContentAsString());
 
         Thread.sleep(jwtManager.getRefreshTokenExpire().plus(Duration.ofSeconds(1)).toMillis());
 
@@ -598,26 +598,26 @@ public class IDMServiceTest
         request.put("refreshToken", refreshToken);
 
         this.mockMvc.perform(post(REFRESH_PATH).contentType(MediaType.APPLICATION_JSON)
-                                               .content(request.toJSONString()))
-                    .andDo(print())
-                    .andExpectAll(isResult(IDMResults.REFRESH_TOKEN_IS_EXPIRED))
-                    .andExpect(jsonPath("accessToken").doesNotHaveJsonPath())
-                    .andExpect(jsonPath("refreshToken").doesNotHaveJsonPath());
+                        .content(request.toJSONString()))
+                .andDo(print())
+                .andExpectAll(isResult(IDMResults.REFRESH_TOKEN_IS_EXPIRED))
+                .andExpect(jsonPath("accessToken").doesNotHaveJsonPath())
+                .andExpect(jsonPath("refreshToken").doesNotHaveJsonPath());
     }
 
     @Test
     public void refreshAfterExpireIsExtended()
-        throws Exception
+            throws Exception
     {
         JSONObject loginResponse =
-            (JSONObject) JSONValue.parse(
-                this.mockMvc.perform(post(LOGIN_PATH).contentType(MediaType.APPLICATION_JSON)
-                                                     .content(ACTIVE.toString()))
-                            .andDo(print())
-                            .andExpectAll(isResult(IDMResults.USER_LOGGED_IN_SUCCESSFULLY))
-                            .andReturn()
-                            .getResponse()
-                            .getContentAsString());
+                (JSONObject) JSONValue.parse(
+                        this.mockMvc.perform(post(LOGIN_PATH).contentType(MediaType.APPLICATION_JSON)
+                                        .content(ACTIVE.toString()))
+                                .andDo(print())
+                                .andExpectAll(isResult(IDMResults.USER_LOGGED_IN_SUCCESSFULLY))
+                                .andReturn()
+                                .getResponse()
+                                .getContentAsString());
 
         Thread.sleep(jwtManager.getRefreshTokenExpire().minus(Duration.ofSeconds(1)).toMillis());
 
@@ -627,11 +627,11 @@ public class IDMServiceTest
         firstRequest.put("refreshToken", refreshToken);
 
         this.mockMvc.perform(post(REFRESH_PATH).contentType(MediaType.APPLICATION_JSON)
-                                               .content(firstRequest.toJSONString()))
-                    .andDo(print())
-                    .andExpectAll(isResult(IDMResults.RENEWED_FROM_REFRESH_TOKEN))
-                    .andExpect(jsonPath("refreshToken").value(refreshToken))
-                    .andExpect(jsonPath("accessToken").isNotEmpty());
+                        .content(firstRequest.toJSONString()))
+                .andDo(print())
+                .andExpectAll(isResult(IDMResults.RENEWED_FROM_REFRESH_TOKEN))
+                .andExpect(jsonPath("refreshToken").value(refreshToken))
+                .andExpect(jsonPath("accessToken").isNotEmpty());
 
         Thread.sleep(jwtManager.getRefreshTokenExpire().minus(Duration.ofSeconds(1)).toMillis());
 
@@ -639,27 +639,27 @@ public class IDMServiceTest
         secondRequest.put("refreshToken", refreshToken);
 
         JSONObject refreshResponse =
-            (JSONObject) JSONValue.parse(
-                this.mockMvc.perform(post(REFRESH_PATH).contentType(MediaType.APPLICATION_JSON)
-                                                       .content(secondRequest.toJSONString()))
-                            .andDo(print())
-                            .andExpectAll(isResult(IDMResults.RENEWED_FROM_REFRESH_TOKEN))
-                            .andExpect(jsonPath("accessToken").isNotEmpty())
-                            .andExpect(jsonPath("refreshToken").value(not(refreshToken)))
-                            .andReturn()
-                            .getResponse()
-                            .getContentAsString()
-            );
+                (JSONObject) JSONValue.parse(
+                        this.mockMvc.perform(post(REFRESH_PATH).contentType(MediaType.APPLICATION_JSON)
+                                        .content(secondRequest.toJSONString()))
+                                .andDo(print())
+                                .andExpectAll(isResult(IDMResults.RENEWED_FROM_REFRESH_TOKEN))
+                                .andExpect(jsonPath("accessToken").isNotEmpty())
+                                .andExpect(jsonPath("refreshToken").value(not(refreshToken)))
+                                .andReturn()
+                                .getResponse()
+                                .getContentAsString()
+                );
 
         JSONObject thirdRequest = new JSONObject();
         thirdRequest.put("refreshToken", refreshToken);
 
         this.mockMvc.perform(post(REFRESH_PATH).contentType(MediaType.APPLICATION_JSON)
-                                               .content(thirdRequest.toJSONString()))
-                    .andDo(print())
-                    .andExpectAll(isResult(IDMResults.REFRESH_TOKEN_IS_REVOKED))
-                    .andExpect(jsonPath("accessToken").doesNotHaveJsonPath())
-                    .andExpect(jsonPath("refreshToken").doesNotHaveJsonPath());
+                        .content(thirdRequest.toJSONString()))
+                .andDo(print())
+                .andExpectAll(isResult(IDMResults.REFRESH_TOKEN_IS_REVOKED))
+                .andExpect(jsonPath("accessToken").doesNotHaveJsonPath())
+                .andExpect(jsonPath("refreshToken").doesNotHaveJsonPath());
 
         String     newRefreshToken  = refreshResponse.getAsString("refreshToken");
 
@@ -667,26 +667,26 @@ public class IDMServiceTest
         fourthRequest.put("refreshToken", newRefreshToken);
 
         this.mockMvc.perform(post(REFRESH_PATH).contentType(MediaType.APPLICATION_JSON)
-                                               .content(fourthRequest.toJSONString()))
-                    .andDo(print())
-                    .andExpectAll(isResult(IDMResults.RENEWED_FROM_REFRESH_TOKEN))
-                    .andExpect(jsonPath("accessToken").isNotEmpty())
-                    .andExpect(jsonPath("refreshToken").value(newRefreshToken));
+                        .content(fourthRequest.toJSONString()))
+                .andDo(print())
+                .andExpectAll(isResult(IDMResults.RENEWED_FROM_REFRESH_TOKEN))
+                .andExpect(jsonPath("accessToken").isNotEmpty())
+                .andExpect(jsonPath("refreshToken").value(newRefreshToken));
     }
 
     @Test
     public void refreshAfterMaxExpire()
-        throws Exception
+            throws Exception
     {
         JSONObject loginResponse =
-            (JSONObject) JSONValue.parse(
-                this.mockMvc.perform(post(LOGIN_PATH).contentType(MediaType.APPLICATION_JSON)
-                                                     .content(ACTIVE.toString()))
-                            .andDo(print())
-                            .andExpectAll(isResult(IDMResults.USER_LOGGED_IN_SUCCESSFULLY))
-                            .andReturn()
-                            .getResponse()
-                            .getContentAsString());
+                (JSONObject) JSONValue.parse(
+                        this.mockMvc.perform(post(LOGIN_PATH).contentType(MediaType.APPLICATION_JSON)
+                                        .content(ACTIVE.toString()))
+                                .andDo(print())
+                                .andExpectAll(isResult(IDMResults.USER_LOGGED_IN_SUCCESSFULLY))
+                                .andReturn()
+                                .getResponse()
+                                .getContentAsString());
 
         JSONObject request = new JSONObject();
         request.put("refreshToken", loginResponse.getAsString("refreshToken"));
@@ -694,16 +694,16 @@ public class IDMServiceTest
         Thread.sleep(jwtManager.getMaxRefreshTokenLifeTime().toMillis());
 
         this.mockMvc.perform(post(REFRESH_PATH).contentType(MediaType.APPLICATION_JSON)
-                                               .content(request.toJSONString()))
-                    .andDo(print())
-                    .andExpectAll(isResult(IDMResults.REFRESH_TOKEN_IS_EXPIRED))
-                    .andExpect(jsonPath("accessToken").doesNotHaveJsonPath())
-                    .andExpect(jsonPath("refreshToken").doesNotHaveJsonPath());
+                        .content(request.toJSONString()))
+                .andDo(print())
+                .andExpectAll(isResult(IDMResults.REFRESH_TOKEN_IS_EXPIRED))
+                .andExpect(jsonPath("accessToken").doesNotHaveJsonPath())
+                .andExpect(jsonPath("refreshToken").doesNotHaveJsonPath());
     }
 
     @Test
     public void refreshTokenInvalidLength()
-        throws Exception
+            throws Exception
     {
         JSONObject request = new JSONObject();
         request.put("refreshToken", "invalidToken");
@@ -711,16 +711,16 @@ public class IDMServiceTest
         Thread.sleep(jwtManager.getMaxRefreshTokenLifeTime().toMillis());
 
         this.mockMvc.perform(post(REFRESH_PATH).contentType(MediaType.APPLICATION_JSON)
-                                               .content(request.toJSONString()))
-                    .andDo(print())
-                    .andExpectAll(isResult(IDMResults.REFRESH_TOKEN_HAS_INVALID_LENGTH))
-                    .andExpect(jsonPath("accessToken").doesNotHaveJsonPath())
-                    .andExpect(jsonPath("refreshToken").doesNotHaveJsonPath());
+                        .content(request.toJSONString()))
+                .andDo(print())
+                .andExpectAll(isResult(IDMResults.REFRESH_TOKEN_HAS_INVALID_LENGTH))
+                .andExpect(jsonPath("accessToken").doesNotHaveJsonPath())
+                .andExpect(jsonPath("refreshToken").doesNotHaveJsonPath());
     }
 
     @Test
     public void refreshTokenInvalidFormat()
-        throws Exception
+            throws Exception
     {
         JSONObject request = new JSONObject();
         request.put("refreshToken", UUID.randomUUID().toString().replace("-", "."));
@@ -728,51 +728,51 @@ public class IDMServiceTest
         Thread.sleep(jwtManager.getMaxRefreshTokenLifeTime().toMillis());
 
         this.mockMvc.perform(post(REFRESH_PATH).contentType(MediaType.APPLICATION_JSON)
-                                               .content(request.toJSONString()))
-                    .andDo(print())
-                    .andExpectAll(isResult(IDMResults.REFRESH_TOKEN_HAS_INVALID_FORMAT))
-                    .andExpect(jsonPath("accessToken").doesNotHaveJsonPath())
-                    .andExpect(jsonPath("refreshToken").doesNotHaveJsonPath());
+                        .content(request.toJSONString()))
+                .andDo(print())
+                .andExpectAll(isResult(IDMResults.REFRESH_TOKEN_HAS_INVALID_FORMAT))
+                .andExpect(jsonPath("accessToken").doesNotHaveJsonPath())
+                .andExpect(jsonPath("refreshToken").doesNotHaveJsonPath());
     }
 
     // Authenticate Tests
 
     @Test
     public void authenticateActiveToken()
-        throws Exception
+            throws Exception
     {
         JSONObject responseObject =
-            (JSONObject) JSONValue.parse(
-                this.mockMvc.perform(post(LOGIN_PATH).contentType(MediaType.APPLICATION_JSON)
-                                                     .content(ACTIVE.toString()))
-                            .andDo(print())
-                            .andExpectAll(isResult(IDMResults.USER_LOGGED_IN_SUCCESSFULLY))
-                            .andReturn()
-                            .getResponse()
-                            .getContentAsString());
+                (JSONObject) JSONValue.parse(
+                        this.mockMvc.perform(post(LOGIN_PATH).contentType(MediaType.APPLICATION_JSON)
+                                        .content(ACTIVE.toString()))
+                                .andDo(print())
+                                .andExpectAll(isResult(IDMResults.USER_LOGGED_IN_SUCCESSFULLY))
+                                .andReturn()
+                                .getResponse()
+                                .getContentAsString());
 
         JSONObject request = new JSONObject();
         request.put("accessToken", responseObject.getAsString("accessToken"));
 
         this.mockMvc.perform(post(AUTHENTICATE_PATH).contentType(MediaType.APPLICATION_JSON)
-                                                    .content(request.toJSONString()))
-                    .andDo(print())
-                    .andExpectAll(isResult(IDMResults.ACCESS_TOKEN_IS_VALID));
+                        .content(request.toJSONString()))
+                .andDo(print())
+                .andExpectAll(isResult(IDMResults.ACCESS_TOKEN_IS_VALID));
     }
 
     @Test
     public void authenticateExpiredToken()
-        throws Exception
+            throws Exception
     {
         JSONObject response =
-            (JSONObject) JSONValue.parse(
-                this.mockMvc.perform(post(LOGIN_PATH).contentType(MediaType.APPLICATION_JSON)
-                                                     .content(ACTIVE.toString()))
-                            .andDo(print())
-                            .andExpectAll(isResult(IDMResults.USER_LOGGED_IN_SUCCESSFULLY))
-                            .andReturn()
-                            .getResponse()
-                            .getContentAsString());
+                (JSONObject) JSONValue.parse(
+                        this.mockMvc.perform(post(LOGIN_PATH).contentType(MediaType.APPLICATION_JSON)
+                                        .content(ACTIVE.toString()))
+                                .andDo(print())
+                                .andExpectAll(isResult(IDMResults.USER_LOGGED_IN_SUCCESSFULLY))
+                                .andReturn()
+                                .getResponse()
+                                .getContentAsString());
 
         Thread.sleep(jwtManager.getAccessTokenExpire().toMillis());
 
@@ -780,29 +780,29 @@ public class IDMServiceTest
         request.put("accessToken", response.getAsString("accessToken"));
 
         this.mockMvc.perform(post(AUTHENTICATE_PATH).contentType(MediaType.APPLICATION_JSON)
-                                                    .content(request.toJSONString()))
-                    .andDo(print())
-                    .andExpectAll(isResult(IDMResults.ACCESS_TOKEN_IS_EXPIRED));
+                        .content(request.toJSONString()))
+                .andDo(print())
+                .andExpectAll(isResult(IDMResults.ACCESS_TOKEN_IS_EXPIRED));
     }
 
     @Test
     public void authenticateInvalidTokenKey()
-        throws Exception
+            throws Exception
     {
         ECKey ecJWK = new ECKeyGenerator(Curve.P_521)
-            .keyUse(KeyUse.SIGNATURE)
-            .keyID(UUID.randomUUID().toString())
-            .generate();
+                .keyUse(KeyUse.SIGNATURE)
+                .keyID(UUID.randomUUID().toString())
+                .generate();
 
         JWSSigner signer = new ECDSASigner(ecJWK);
 
         SignedJWT jws = new SignedJWT(
-            new JWSHeader(JWSAlgorithm.ES512),
-            new JWTClaimsSet.Builder()
-                .subject("Subject")
-                .expirationTime(Date.from(Instant.now().plus(Duration.ofHours(1))))
-                .claim("roles", new ArrayList<String>())
-                .build());
+                new JWSHeader(JWSAlgorithm.ES512),
+                new JWTClaimsSet.Builder()
+                        .subject("Subject")
+                        .expirationTime(Date.from(Instant.now().plus(Duration.ofHours(1))))
+                        .claim("roles", new ArrayList<String>())
+                        .build());
 
         jws.sign(signer);
 
@@ -810,26 +810,26 @@ public class IDMServiceTest
         request.put("accessToken", jws.serialize());
 
         this.mockMvc.perform(post(AUTHENTICATE_PATH).contentType(MediaType.APPLICATION_JSON)
-                                                    .content(request.toJSONString()))
-                    .andDo(print())
-                    .andExpectAll(isResult(IDMResults.ACCESS_TOKEN_IS_INVALID));
+                        .content(request.toJSONString()))
+                .andDo(print())
+                .andExpectAll(isResult(IDMResults.ACCESS_TOKEN_IS_INVALID));
     }
 
     @Test
     public void authenticateInvalidClaims()
-        throws Exception
+            throws Exception
     {
         JWTClaimsSet claimsSet =
-            new JWTClaimsSet.Builder()
-                .subject("Email")
-                .expirationTime(Date.from(Instant.now().plus(Duration.ofHours(1))))
-                .build();
+                new JWTClaimsSet.Builder()
+                        .subject("Email")
+                        .expirationTime(Date.from(Instant.now().plus(Duration.ofHours(1))))
+                        .build();
 
         JWSHeader header =
-            new JWSHeader.Builder(JWTManager.JWS_ALGORITHM)
-                .keyID(jwtManager.getEcKey().getKeyID())
-                .type(JWTManager.JWS_TYPE)
-                .build();
+                new JWSHeader.Builder(JWTManager.JWS_ALGORITHM)
+                        .keyID(jwtManager.getEcKey().getKeyID())
+                        .type(JWTManager.JWS_TYPE)
+                        .build();
 
         SignedJWT signedJWT = new SignedJWT(header, claimsSet);
         signedJWT.sign(jwtManager.getSigner());
@@ -838,8 +838,8 @@ public class IDMServiceTest
         request.put("accessToken", signedJWT.serialize());
 
         this.mockMvc.perform(post(AUTHENTICATE_PATH).contentType(MediaType.APPLICATION_JSON)
-                                                    .content(request.toJSONString()))
-                    .andDo(print())
-                    .andExpectAll(isResult(IDMResults.ACCESS_TOKEN_IS_INVALID));
+                        .content(request.toJSONString()))
+                .andDo(print())
+                .andExpectAll(isResult(IDMResults.ACCESS_TOKEN_IS_INVALID));
     }
 }
