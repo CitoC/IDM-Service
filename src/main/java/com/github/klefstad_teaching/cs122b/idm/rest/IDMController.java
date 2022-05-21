@@ -4,7 +4,9 @@ import com.github.klefstad_teaching.cs122b.core.result.BasicResults;
 import com.github.klefstad_teaching.cs122b.core.result.IDMResults;
 import com.github.klefstad_teaching.cs122b.idm.component.IDMAuthenticationManager;
 import com.github.klefstad_teaching.cs122b.idm.component.IDMJwtManager;
+import com.github.klefstad_teaching.cs122b.idm.model.request.LoginRequest;
 import com.github.klefstad_teaching.cs122b.idm.model.request.RegisterRequest;
+import com.github.klefstad_teaching.cs122b.idm.model.response.LoginResponse;
 import com.github.klefstad_teaching.cs122b.idm.model.response.RegisterResponse;
 import com.github.klefstad_teaching.cs122b.idm.repo.entity.type.UserStatus;
 import com.github.klefstad_teaching.cs122b.idm.util.Validate;
@@ -38,20 +40,23 @@ public class IDMController
         this.validate = validate;
     }
 
-
     @PostMapping("/register")
-    public ResponseEntity<RegisterResponse> register(@RequestBody RegisterRequest request) throws NoSuchAlgorithmException, InvalidKeySpecException {
-        // user with this email already exists
+    public ResponseEntity<RegisterResponse> register(@RequestBody RegisterRequest request) {
+
+        // user with this email already exists - catch in addUserToDB()
+
         // password does not match length requirements
         // password does not meet character requirement
+        validate.validatePassword(request.getPassword());
+
         // email address has invalid format
         // email address has invalid length
+        validate.validateEmail(request.getEmail());
 
+        // no more error (except the email already exists), go ahead and the user in the database
+        authManager.createAndInsertUser(request.getEmail(), request.getPassword());
 
-        // no more error
-        // get salt and hash the password
-
-        // create math response object
+        // create register response object
         RegisterResponse response = new RegisterResponse()
                 .setResult(IDMResults.USER_REGISTERED_SUCCESSFULLY);
 
@@ -61,13 +66,17 @@ public class IDMController
                 .body(response);
     }
 
-    private Boolean checkEmailExists()
-    {
-        return false;
-    }
-
-    private void registerToDatabase()
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request)
     {
 
+
+        RegisterResponse response = new RegisterResponse()
+                .setResult(IDMResults.USER_REGISTERED_SUCCESSFULLY);
+
+        // return the object
+        return ResponseEntity
+                .status(response.getResult().status())
+                .body(response);
     }
 }

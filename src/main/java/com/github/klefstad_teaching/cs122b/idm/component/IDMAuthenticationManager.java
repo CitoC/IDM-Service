@@ -1,9 +1,12 @@
 package com.github.klefstad_teaching.cs122b.idm.component;
 
+import com.github.klefstad_teaching.cs122b.core.error.ResultError;
+import com.github.klefstad_teaching.cs122b.core.result.IDMResults;
 import com.github.klefstad_teaching.cs122b.idm.repo.IDMRepo;
 import com.github.klefstad_teaching.cs122b.idm.repo.entity.RefreshToken;
 import com.github.klefstad_teaching.cs122b.idm.repo.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -61,17 +64,31 @@ public class IDMAuthenticationManager
         return salt;
     }
 
+    // used for login
     public User selectAndAuthenticateUser(String email, char[] password)
     {
 
         return null;
     }
 
+    // used for register
     public void createAndInsertUser(String email, char[] password)
     {
-        // salt and has the password, then pass
+        // generate salt and hash the password
         byte[] salt = genSalt();
-        repo.insertUserIntoRepo(email, salt, password);
+        byte[] hashedPassword = hashPassword(password,salt);
+
+        // turn the salt and hashed password into base64 string
+        String base64EncodedSalt = Base64.getEncoder().encodeToString(salt);
+        String base64EncodedHashedPassword = Base64.getEncoder().encodeToString(hashedPassword);
+
+        // add to the database
+        try {
+            repo.addUserToDB(email, base64EncodedSalt, base64EncodedHashedPassword);
+        } catch (DuplicateKeyException e) {
+            throw new ResultError(IDMResults.USER_ALREADY_EXISTS);
+        }
+//        repo.insertUserIntoRepo(email, base64EncodedSalt, base64EncodedHashedPassword);
     }
 
     public void insertRefreshToken(RefreshToken refreshToken)
