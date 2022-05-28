@@ -44,7 +44,7 @@ public final class Validate
             throw new ResultError(IDMResults.EMAIL_ADDRESS_HAS_INVALID_FORMAT);
 
         // check length
-        if (email.length() < 10 || email.length() > 20)
+        if (email.length() < 6 || email.length() > 32)
             throw new ResultError(IDMResults.EMAIL_ADDRESS_HAS_INVALID_LENGTH);
     }
 
