@@ -18,6 +18,7 @@ import javax.crypto.spec.PBEKeySpec;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Base64;
 
@@ -72,7 +73,7 @@ public class IDMAuthenticationManager
     public User selectAndAuthenticateUser(String email, char[] password)
     {
         // either will return exactly one user or user not found exception will occur and end
-        User user = repo.selectAUser(email, password);
+        User user = repo.selectAUser(email);
 
         // check if password matches
         byte[] hashedPassword = hashPassword(password, user.getSalt());
@@ -119,29 +120,41 @@ public class IDMAuthenticationManager
         repo.addRefreshTokenToDB(token, userId, tokenStatus, expireTime, maxLifeTime);
     }
 
-    public RefreshToken verifyRefreshToken(String token)
+    public RefreshToken verifyRefreshTokenExists(String token)
     {
-        // TODO: go into repo and find the refresh token
-        return null;
+        // either will return a refresh token or throw a not found exception
+        RefreshToken refreshToken = repo.selectAToken(token);
+        return refreshToken;
     }
 
-    public void updateRefreshTokenExpireTime(RefreshToken token)
+    public void expireRefreshToken(RefreshToken refreshToken)
     {
-        // TODO: go into repo to update expire time of refresh token
+        // update the refresh token status as EXPIRED
+        refreshToken.setTokenStatus(TokenStatus.EXPIRED);
+        // also update the repo
+        repo.updateRefreshTokenAsExpired(refreshToken);
+        // then throw
+        throw new ResultError(IDMResults.REFRESH_TOKEN_IS_EXPIRED);
     }
 
-    public void expireRefreshToken(RefreshToken token)
+    public void updateRefreshTokenExpireTime(RefreshToken refreshToken, Duration duration)
     {
-        // TODO: go into repo and
+        // update the refresh token expire time
+        refreshToken.setExpireTime(Instant.now().plus(duration));
+        // also update the repo
+        repo.updateRefreshTokenExpireTime(refreshToken);
     }
 
-    public void revokeRefreshToken(RefreshToken token)
+
+    public void revokeRefreshToken(RefreshToken refreshToken)
     {
-        // TODO: mark old token as revoked?
+        refreshToken.setTokenStatus(TokenStatus.REVOKED);
+        repo.updateRefreshTokenAsRevoked(refreshToken);
     }
 
     public User getUserFromRefreshToken(RefreshToken refreshToken)
     {
-        return null;
+        User user = repo.selectUserFromRefreshToken(refreshToken);
+        return user;
     }
 }

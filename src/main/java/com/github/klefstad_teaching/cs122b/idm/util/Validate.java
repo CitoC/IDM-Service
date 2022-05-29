@@ -3,6 +3,8 @@ package com.github.klefstad_teaching.cs122b.idm.util;
 import com.github.klefstad_teaching.cs122b.core.error.ResultError;
 import com.github.klefstad_teaching.cs122b.core.result.IDMResults;
 import org.springframework.stereotype.Component;
+
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 @Component
@@ -48,4 +50,18 @@ public final class Validate
             throw new ResultError(IDMResults.EMAIL_ADDRESS_HAS_INVALID_LENGTH);
     }
 
+    public void validateRefreshTokenLength(String token)
+    {
+        if (token.length() != 36)
+            throw new ResultError(IDMResults.REFRESH_TOKEN_HAS_INVALID_LENGTH);
+    }
+
+    public void validateRefreshTokenFormat(String token)
+    {
+        try {
+            UUID uuid = UUID.fromString(token);
+        } catch (IllegalArgumentException e) {
+            throw new ResultError(IDMResults.REFRESH_TOKEN_HAS_INVALID_FORMAT);
+        }
+    }
 }

@@ -1,5 +1,7 @@
 package com.github.klefstad_teaching.cs122b.idm.component;
 
+import com.github.klefstad_teaching.cs122b.core.error.ResultError;
+import com.github.klefstad_teaching.cs122b.core.result.IDMResults;
 import com.github.klefstad_teaching.cs122b.core.security.JWTManager;
 import com.github.klefstad_teaching.cs122b.idm.config.IDMServiceConfig;
 import com.github.klefstad_teaching.cs122b.idm.repo.entity.RefreshToken;
@@ -13,6 +15,7 @@ import com.nimbusds.jose.JWSHeader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 import java.util.UUID;
@@ -89,10 +92,20 @@ public class IDMJwtManager
         return UUID.randomUUID();
     }
 
-    public boolean hasExpired(RefreshToken refreshToken)
+    public void hasExpiredStatus(RefreshToken refreshToken)
     {
-        // can be called in Controller after getting back a refreshToken
-        return false;
+        // check if token status is expired
+        if (refreshToken.getTokenStatus() == TokenStatus.EXPIRED)
+            throw new ResultError(IDMResults.REFRESH_TOKEN_IS_EXPIRED);
+
+
+    }
+
+    public void hasRevokedStatus(RefreshToken refreshToken)
+    {
+        // check if token status if revoked
+        if (refreshToken.getTokenStatus() == TokenStatus.REVOKED)
+            throw new ResultError(IDMResults.REFRESH_TOKEN_IS_REVOKED);
     }
 
     public boolean needsRefresh(RefreshToken refreshToken)
@@ -103,6 +116,11 @@ public class IDMJwtManager
     public void updateRefreshTokenExpireTime(RefreshToken refreshToken)
     {
 
+    }
+
+    public Duration getRefreshTokenExpireDuration()
+    {
+        return this.jwtManager.getRefreshTokenExpire();
     }
 
     private void verifyJWT(SignedJWT jwt)

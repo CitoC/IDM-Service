@@ -2,6 +2,7 @@ package com.github.klefstad_teaching.cs122b.idm.repo;
 
 import com.github.klefstad_teaching.cs122b.core.error.ResultError;
 import com.github.klefstad_teaching.cs122b.core.result.IDMResults;
+import com.github.klefstad_teaching.cs122b.idm.repo.entity.RefreshToken;
 import com.github.klefstad_teaching.cs122b.idm.repo.entity.User;
 import com.github.klefstad_teaching.cs122b.idm.repo.entity.type.TokenStatus;
 import com.github.klefstad_teaching.cs122b.idm.repo.entity.type.UserStatus;
@@ -12,8 +13,10 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import java.sql.Ref;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.time.Duration;
 import java.time.Instant;
 
 @Component
@@ -47,7 +50,7 @@ public class IDMRepo
     // select a user with the matching email
     // if such email exists, return exactly ONE object
     // if not, throw an exception
-    public User selectAUser(String email, char[] password)
+    public User selectAUser(String email)
     {
         try {
             User user = this.template.queryForObject(
@@ -85,5 +88,95 @@ public class IDMRepo
                         .addValue("expireTime", Timestamp.from(expireTime))
                         .addValue("maxLifeTime", Timestamp.from(maxLifeTime))
         );
+    }
+
+    public RefreshToken selectAToken(String token)
+    {
+        try {
+            RefreshToken refreshToken = this.template.queryForObject(
+                    "SELECT id, token, user_id, token_status_id, expire_time, max_life_time " +
+                    "FROM idm.refresh_token " +
+                    "WHERE token = :token",
+
+                    new MapSqlParameterSource()
+                            .addValue("token", token, Types.VARCHAR),
+
+                    (rs, rowCount) ->
+                            new RefreshToken()
+                                    .setId(rs.getInt("id"))
+                                    .setToken(rs.getString("token"))
+                                    .setUserId(rs.getInt("user_id"))
+                                    .setTokenStatus(TokenStatus.fromId(rs.getInt("token_status_id")))
+                                    .setExpireTime(rs.getTimestamp("expire_time").toInstant())
+                                    .setMaxLifeTime(rs.getTimestamp("max_life_time").toInstant())
+            );
+            return refreshToken;
+        } catch (EmptyResultDataAccessException e) {
+            throw new ResultError(IDMResults.REFRESH_TOKEN_NOT_FOUND);
+        }
+    }
+
+    public void updateRefreshTokenAsExpired(RefreshToken refreshToken)
+    {
+        this.template.update(
+                "UPDATE idm.refresh_token " +
+                "SET token_status_id = :status " +
+                "WHERE id = :id",
+
+                new MapSqlParameterSource()
+                        .addValue("status", refreshToken.getTokenStatus().id())
+                        .addValue("id", refreshToken.getId())
+        );
+    }
+
+    public void updateRefreshTokenExpireTime(RefreshToken refreshToken)
+    {
+        this.template.update(
+                "UPDATE idm.refresh_token " +
+                "SET expire_time = :expireTime " +
+                "WHERE id = :id",
+
+                new MapSqlParameterSource()
+                        .addValue("expireTime", Timestamp.from(refreshToken.getExpireTime()))
+                        .addValue("id", refreshToken.getId())
+        );
+    }
+
+    public void updateRefreshTokenAsRevoked(RefreshToken refreshToken)
+    {
+        this.template.update(
+                "UPDATE idm.refresh_token " +
+                "SET token_status_id = :status " +
+                "WHERE id = :id",
+
+                new MapSqlParameterSource()
+                        .addValue("status", refreshToken.getTokenStatus().id())
+                        .addValue("id", refreshToken.getId())
+        );
+    }
+
+    public User selectUserFromRefreshToken(RefreshToken refreshToken)
+    {
+        try {
+            User user = this.template.queryForObject(
+                    "SELECT id, email, user_status_id, salt, hashed_password " +
+                    "FROM idm.user " +
+                    "WHERE id = :id",
+
+                    new MapSqlParameterSource()
+                            .addValue("id", refreshToken.getUserId(), Types.INTEGER),
+
+                    (rs, rowNum) ->
+                            new User()
+                                    .setId(rs.getInt("id"))
+                                    .setEmail(rs.getString("email"))
+                                    .setUserStatus(UserStatus.fromId(rs.getInt("user_status_id")))
+                                    .setSalt(rs.getString("salt"))
+                                    .setHashedPassword(rs.getString("hashed_password"))
+            );
+            return user;
+        } catch (EmptyResultDataAccessException e) {
+            throw new ResultError(IDMResults.USER_NOT_FOUND);
+        }
     }
 }
