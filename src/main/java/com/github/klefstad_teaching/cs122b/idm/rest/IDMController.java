@@ -15,6 +15,7 @@ import com.github.klefstad_teaching.cs122b.idm.repo.entity.RefreshToken;
 import com.github.klefstad_teaching.cs122b.idm.repo.entity.User;
 import com.github.klefstad_teaching.cs122b.idm.util.Validate;
 import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.proc.BadJOSEException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.text.ParseException;
 import java.time.Duration;
 import java.time.Instant;
 
@@ -175,7 +177,17 @@ public class IDMController
 
     @PostMapping("/authenticate")
     public ResponseEntity<AuthResponse> authenticate(@RequestBody AuthRequest request)
+            throws BadJOSEException, ParseException, JOSEException
     {
+        // verify if token is invalid or expired
+        // if yes, then throw exception
+        jwtManager.verifyAccessToken(request.getAccessToken());
 
+        // the accessToken is valid
+        AuthResponse response = new AuthResponse()
+                .setResult(IDMResults.ACCESS_TOKEN_IS_VALID);
+        return ResponseEntity
+                .status(response.getResult().status())
+                .body(response);
     }
 }

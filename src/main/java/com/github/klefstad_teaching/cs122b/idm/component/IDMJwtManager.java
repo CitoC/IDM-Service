@@ -8,6 +8,7 @@ import com.github.klefstad_teaching.cs122b.idm.repo.entity.RefreshToken;
 import com.github.klefstad_teaching.cs122b.idm.repo.entity.User;
 import com.github.klefstad_teaching.cs122b.idm.repo.entity.type.TokenStatus;
 import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.RemoteKeySourceException;
 import com.nimbusds.jose.proc.BadJOSEException;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
@@ -15,6 +16,7 @@ import com.nimbusds.jose.JWSHeader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.text.ParseException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
@@ -108,29 +110,35 @@ public class IDMJwtManager
             throw new ResultError(IDMResults.REFRESH_TOKEN_IS_REVOKED);
     }
 
-    public boolean needsRefresh(RefreshToken refreshToken)
-    {
-        return false;
-    }
-
-    public void updateRefreshTokenExpireTime(RefreshToken refreshToken)
-    {
-
-    }
-
     public Duration getRefreshTokenExpireDuration()
     {
         return this.jwtManager.getRefreshTokenExpire();
     }
 
-    private void verifyJWT(SignedJWT jwt)
-            throws JOSEException, BadJOSEException
+    public void verifyAccessToken(String accessToken)
+            throws ParseException, BadJOSEException, JOSEException
     {
+        // verify JWT valid or not
+        verifyJWT(accessToken);
 
+        // verify expire time
+        SignedJWT rebuiltSingedJWT = SignedJWT.parse(accessToken);
+        Instant expireTime = rebuiltSingedJWT.getJWTClaimsSet().getExpirationTime().toInstant();
+
+        if ((Instant.now().isAfter(expireTime)))
+            throw new ResultError(IDMResults.ACCESS_TOKEN_IS_EXPIRED);
     }
 
-    public void verifyAccessToken(String jws)
-    {
+    private void verifyJWT(String accessToken)
+            throws JOSEException, BadJOSEException, ParseException {
+
+        try {
+            SignedJWT rebuiltSingedJWT = SignedJWT.parse(accessToken);
+            rebuiltSingedJWT.verify(jwtManager.getVerifier());
+            jwtManager.getJwtProcessor().process(rebuiltSingedJWT, null);
+        } catch (IllegalStateException | JOSEException | BadJOSEException | ParseException e) {
+            throw new ResultError(IDMResults.ACCESS_TOKEN_IS_INVALID);
+        }
 
     }
 }
