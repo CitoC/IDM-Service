@@ -24,7 +24,8 @@ public enum Role
 
     public int getId() { return id; }
 
-    @JsonValue public String getName() { return name; }
+    @JsonValue
+    public String getName() { return name; }
 
     @JsonCreator
     public static Role creator(String name)

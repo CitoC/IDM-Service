@@ -33,6 +33,7 @@ public class IDMRepo
     // create a user with the email, salt, and hashedPassword.
     // UserStatus is ACTIVE by default.
     // salt and password are both encoded to base64. password is also hashed
+    // could potentially DuplicateKeyException whcih will be caught by the caller
     public void addUserToDB(String email, String salt, String password)
             throws DuplicateKeyException
     {

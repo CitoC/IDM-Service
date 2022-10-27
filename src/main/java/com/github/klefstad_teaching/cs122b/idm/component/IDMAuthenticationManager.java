@@ -117,6 +117,7 @@ public class IDMAuthenticationManager
         TokenStatus tokenStatus = refreshToken.getTokenStatus();
         Instant expireTime = refreshToken.getExpireTime();
         Instant maxLifeTime = refreshToken.getMaxLifeTime();
+
         repo.addRefreshTokenToDB(token, userId, tokenStatus, expireTime, maxLifeTime);
     }
 
